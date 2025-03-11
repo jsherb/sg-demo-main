@@ -14,13 +14,10 @@ function initialize() {
   }
   
   // Use legacy render method for better compatibility with Looker extensions
-  // Using React.createElement directly instead of JSX to avoid JSX runtime issues
   ReactDOM.render(
-    React.createElement(
-      React.StrictMode,
-      null,
-      React.createElement(App, null)
-    ),
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
     rootElement
   );
 }

@@ -53,12 +53,19 @@ module.exports = {
       "crypto": require.resolve("crypto-browserify"),
       "stream": require.resolve("stream-browserify"),
       "buffer": require.resolve("buffer/"),
+    },
+    alias: {
+      // Force all modules to use the same React instance
+      'react': path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom')
     }
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+      React: 'react',
+      ReactDOM: 'react-dom'
     }),
     new HtmlWebpackPlugin({
       template: './index.html',
@@ -76,24 +83,7 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
   },
-  externals: {
-    react: {
-      commonjs: 'react',
-      commonjs2: 'react',
-      amd: 'react',
-      root: 'React'
-    },
-    'react-dom': {
-      commonjs: 'react-dom',
-      commonjs2: 'react-dom',
-      amd: 'react-dom',
-      root: 'ReactDOM'
-    },
-    'react/jsx-runtime': {
-      commonjs: 'react/jsx-runtime',
-      commonjs2: 'react/jsx-runtime',
-      amd: 'react/jsx-runtime',
-      root: 'React'
-    }
-  }
+  // Change to a different approach - instead of externalizing React,
+  // we'll include it in the bundle for Looker extensions
+  externals: {}
 }; 
