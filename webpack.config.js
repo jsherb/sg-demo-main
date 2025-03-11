@@ -90,10 +90,10 @@ module.exports = {
       root: 'ReactDOM'
     },
     'react/jsx-runtime': {
-      commonjs: ['react/jsx-runtime'],
-      commonjs2: ['react/jsx-runtime'],
-      amd: ['react/jsx-runtime'],
-      root: ['React', 'jsxRuntime']
+      commonjs: 'react/jsx-runtime',
+      commonjs2: 'react/jsx-runtime',
+      amd: 'react/jsx-runtime',
+      root: 'React'
     }
   }
 }; 
