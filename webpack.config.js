@@ -15,7 +15,11 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '',
+    library: {
+      type: 'umd',
+      name: 'LookerExtension'
+    }
   },
   module: {
     rules: [
@@ -58,5 +62,9 @@ module.exports = {
       type: 'https'
     },
     historyApiFallback: true
+  },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM'
   }
 }; 
