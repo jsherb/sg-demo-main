@@ -20,7 +20,8 @@ module.exports = {
     library: {
       type: 'umd',
       name: 'LookerExtension'
-    }
+    },
+    globalObject: 'this'
   },
   module: {
     rules: [
@@ -75,9 +76,24 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
   },
-  // Properly externalize React for Looker extensions
   externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM'
+    react: {
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'react',
+      root: 'React'
+    },
+    'react-dom': {
+      commonjs: 'react-dom',
+      commonjs2: 'react-dom',
+      amd: 'react-dom',
+      root: 'ReactDOM'
+    },
+    'react/jsx-runtime': {
+      commonjs: ['react/jsx-runtime'],
+      commonjs2: ['react/jsx-runtime'],
+      amd: ['react/jsx-runtime'],
+      root: ['React', 'jsxRuntime']
+    }
   }
 }; 
