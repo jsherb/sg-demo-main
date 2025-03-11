@@ -598,5 +598,3 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
     </div>
   );
 };
-
-export type { FileType };
