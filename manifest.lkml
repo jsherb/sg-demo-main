@@ -12,10 +12,5 @@ application: my_looker_extension {
     new_window: yes
     new_window_external_urls: []
     local_storage: yes
-    # external_api_urls: []
-    use_form_submit: yes
-    allow_same_origin: yes
-    allow_forms: yes
-    allow_downloads: yes
   }
 } 

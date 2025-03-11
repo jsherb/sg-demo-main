@@ -16,7 +16,11 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/',
+    library: {
+      type: 'umd',
+      name: 'LookerExtension'
+    }
   },
   module: {
     rules: [
@@ -74,11 +78,6 @@ module.exports = {
   // Properly externalize React for Looker extensions
   externals: {
     react: 'React',
-    'react-dom': 'ReactDOM',
-    'react-router-dom': 'ReactRouterDOM',
-    '@looker/components': 'LookerComponents',
-    '@looker/components-providers': 'LookerComponentsProviders',
-    '@looker/extension-sdk': 'LookerExtensionSDK',
-    '@looker/extension-sdk-react': 'LookerExtensionSDKReact'
+    'react-dom': 'ReactDOM'
   }
 }; 
