@@ -11,15 +11,12 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
 }, {});
 
 module.exports = {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/main.tsx',
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '',
-    library: {
-      type: 'umd',
-      name: 'LookerExtension'
-    }
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -40,31 +37,48 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
-      }
+      },
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.jsx']
+    extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      "path": require.resolve("path-browserify"),
+      "os": require.resolve("os-browserify/browser"),
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify"),
+      "buffer": require.resolve("buffer/"),
+    }
   },
   plugins: [
+    new webpack.DefinePlugin(envKeys),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new HtmlWebpackPlugin({
       template: './index.html',
       filename: 'index.html'
-    }),
-    new webpack.DefinePlugin(envKeys)
+    })
   ],
   devServer: {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    port: 8080,
     server: {
-      type: 'https'
+      type: 'https',
     },
-    historyApiFallback: true
+    port: 8080,
+    hot: true,
+    historyApiFallback: true,
   },
+  // Properly externalize React for Looker extensions
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM'
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    'react-router-dom': 'ReactRouterDOM',
+    '@looker/components': 'LookerComponents',
+    '@looker/components-providers': 'LookerComponentsProviders',
+    '@looker/extension-sdk': 'LookerExtensionSDK',
+    '@looker/extension-sdk-react': 'LookerExtensionSDKReact'
   }
 }; 
