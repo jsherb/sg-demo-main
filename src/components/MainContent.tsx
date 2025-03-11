@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ArrowRight, ThumbsUp, ThumbsDown, Edit, Send, Database, Maximize2, ChevronLeft, Table2, Plus, Sparkles, FileDown, Clipboard, FileText, Paperclip, Code2, ArrowUpLeft } from 'lucide-react';
 import { FileBrowser, type FileType } from './FileBrowser';
 import clsx from 'clsx';
+import geminiLogo from '../assets/gemini.png';
 
 const steps = [
   { id: 1, title: 'Data Selection' },
@@ -653,7 +654,7 @@ explore: order_items {
             <div className="p-6 flex justify-center items-center min-h-[calc(100vh-120px)]">
               <div className="max-w-lg text-center">
                 <div className="w-[320px] h-[180px] mx-auto mb-6">
-                  <img src="/src/assets/gemini.png" alt="Gemini" className="w-full h-full object-contain" />
+                  <img src={geminiLogo} alt="Gemini" className="w-full h-full object-contain" />
                 </div>
 
                 <h2 className="text-2xl font-semibold mb-3 text-gray-900">Start building with Gemini</h2>

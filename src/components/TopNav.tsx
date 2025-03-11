@@ -1,5 +1,7 @@
 import React from 'react';
 import { Menu, HelpCircle, User } from 'lucide-react';
+// Import the logo image
+import lookerLogo from '../assets/looker_logo.png';
 
 export const TopNav = () => {
   return (
@@ -8,7 +10,7 @@ export const TopNav = () => {
         <button className="p-1.5 hover:bg-gray-100 rounded">
           <Menu className="text-gray-600" size={20} />
         </button>
-        <img src="/src/assets/looker_logo.png" alt="Looker" className="h-10" />
+        <img src={lookerLogo} alt="Looker" className="h-10" />
       </div>
       <div className="flex items-center space-x-2">
         <button className="p-1.5 hover:bg-gray-100 rounded">

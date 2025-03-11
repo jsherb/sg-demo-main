@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
@@ -13,12 +13,12 @@ function initialize() {
     document.body.appendChild(rootElement);
   }
   
-  // Use legacy render method for better compatibility with Looker extensions
-  ReactDOM.render(
+  // Use modern createRoot method for React 18
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>,
-    rootElement
+    </React.StrictMode>
   );
 }
 
