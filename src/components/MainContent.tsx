@@ -1191,7 +1191,7 @@ explore: order_items {
                               </div>
 
                               <div className="p-4 border-b border-[#dadce0]">
-                                <div className="text-[13px] text-[#5f6368] font-mono mb-2">ecomm.model</div>
+                                <div className="text-[13px] text-[#5f6368] font-mono mb-2 model-header">ecomm.model</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
                                   <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code className="font-mono">{`connection: "big_query_connection"
