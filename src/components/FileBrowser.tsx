@@ -43,128 +43,128 @@ explore: order_items {
   {
     name: 'views/order_items.view',
     content: `view: order_items {
-sql_table_name: bigquery-public-data.thelook_ecommerce.order_items ;;
+  sql_table_name: bigquery-public-data.thelook_ecommerce.order_items ;;
 
-dimension: id {
-primary_key: yes
-type: number
-sql: \${TABLE}.id ;;
-}
+  dimension: id {
+    primary_key: yes
+    type: number
+    sql: \${TABLE}.id ;;
+  }
 
-dimension: order_id {
-type: number
-sql: \${TABLE}.order_id ;;
-}
+  dimension: order_id {
+    type: number
+    sql: \${TABLE}.order_id ;;
+  }
 
-dimension: user_id {
-type: number
-sql: \${TABLE}.user_id ;;
-}
+  dimension: user_id {
+    type: number
+    sql: \${TABLE}.user_id ;;
+  }
 
-dimension: product_id {
-type: number
-sql: \${TABLE}.product_id ;;
-}
+  dimension: product_id {
+    type: number
+    sql: \${TABLE}.product_id ;;
+  }
 
-dimension: inventory_item_id {
-type: number
-sql: \${TABLE}.inventory_item_id ;;
-}
+  dimension: inventory_item_id {
+    type: number
+    sql: \${TABLE}.inventory_item_id ;;
+  }
 
-dimension: status {
-type: string
-sql: \${TABLE}.status ;;
-}
+  dimension: status {
+    type: string
+    sql: \${TABLE}.status ;;
+  }
 
-dimension_group: created {
-type: time
-timeframes: [raw, date, week, month, quarter, year]
-sql: \${TABLE}.created_at ;;
-}
+  dimension_group: created {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    sql: \${TABLE}.created_at ;;
+  }
 
-dimension_group: shipped {
-type: time
-timeframes: [raw, date, week, month, quarter, year]
-sql: \${TABLE}.shipped_at ;;
-}
+  dimension_group: shipped {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    sql: \${TABLE}.shipped_at ;;
+  }
 
-dimension_group: delivered {
-type: time
-timeframes: [raw, date, week, month, quarter, year]
-sql: \${TABLE}.delivered_at ;;
-}
+  dimension_group: delivered {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    sql: \${TABLE}.delivered_at ;;
+  }
 
-dimension_group: returned {
-type: time
-timeframes: [raw, date, week, month, quarter, year]
-sql: \${TABLE}.returned_at ;;
-}
+  dimension_group: returned {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    sql: \${TABLE}.returned_at ;;
+  }
 
-dimension: sale_price {
-type: number
-sql: \${TABLE}.sale_price ;;
-value_format_name: usd
-}
+  dimension: sale_price {
+    type: number
+    sql: \${TABLE}.sale_price ;;
+    value_format_name: usd
+  }
 
-measure: count {
-type: count
-drill_fields: [id, user_id, product_id]
-}
+  measure: count {
+    type: count
+    drill_fields: [id, user_id, product_id]
+  }
 
-dimension: is_shipped {
-label: "Is Shipped"
-description: "Indicates if the order item has been shipped"
-type: yesno
-sql: \${status} = 'Shipped' ;;
-}
+  dimension: is_shipped {
+    label: "Is Shipped"
+    description: "Indicates if the order item has been shipped"
+    type: yesno
+    sql: \${status} = 'Shipped' ;;
+  }
 
-dimension: is_delivered {
-label: "Is Delivered"
-description: "Indicates if the order item has been delivered"
-type: yesno
-sql: \${status} = 'Delivered' ;;
-}
+  dimension: is_delivered {
+    label: "Is Delivered"
+    description: "Indicates if the order item has been delivered"
+    type: yesno
+    sql: \${status} = 'Delivered' ;;
+  }
 
-dimension: is_returned {
-label: "Is Returned"
-description: "Indicates if the order item has been returned"
-type: yesno
-sql: \${status} = 'Returned' ;;
-}
+  dimension: is_returned {
+    label: "Is Returned"
+    description: "Indicates if the order item has been returned"
+    type: yesno
+    sql: \${status} = 'Returned' ;;
+  }
 
-dimension_group: time_to_ship {
-label: "Time to Ship"
-description: "Duration between order creation and shipment"
-type: duration
-intervals: [day, hour, minute]
-sql_start: \${created_raw} ;;
-sql_end: \${shipped_raw} ;;
-}
+  dimension_group: time_to_ship {
+    label: "Time to Ship"
+    description: "Duration between order creation and shipment"
+    type: duration
+    intervals: [day, hour, minute]
+    sql_start: \${created_raw} ;;
+    sql_end: \${shipped_raw} ;;
+  }
 
-dimension_group: time_to_deliver {
-label: "Time to Deliver"
-description: "Duration between order shipment and delivery"
-type: duration
-intervals: [day, hour, minute]
-sql_start: \${shipped_raw} ;;
-sql_end: \${delivered_raw} ;;
-}
+  dimension_group: time_to_deliver {
+    label: "Time to Deliver"
+    description: "Duration between order shipment and delivery"
+    type: duration
+    intervals: [day, hour, minute]
+    sql_start: \${shipped_raw} ;;
+    sql_end: \${delivered_raw} ;;
+  }
 
-measure: average_sale_price {
-label: "Average Sale Price"
-description: "Average sale price of the order items"
-type: average
-sql: \${sale_price} ;;
-value_format_name: usd
-}
+  measure: average_sale_price {
+    label: "Average Sale Price"
+    description: "Average sale price of the order items"
+    type: average
+    sql: \${sale_price} ;;
+    value_format_name: usd
+  }
 
-measure: total_sale_price {
-label: "Total Sale Price"
-description: "Total sale price of the order items"
-type: sum
-sql: \${sale_price} ;;
-value_format_name: usd
-}
+  measure: total_sale_price {
+    label: "Total Sale Price"
+    description: "Total sale price of the order items"
+    type: sum
+    sql: \${sale_price} ;;
+    value_format_name: usd
+  }
 }`,
     icon: <FileText size={16} className="text-[#5f6368]" />,
     preview: 'view: order_items {'
@@ -172,143 +172,143 @@ value_format_name: usd
   {
     name: 'views/products.view',
     content: `view: products {
-sql_table_name: bigquery-public-data.thelook_ecommerce.products ;;
+  sql_table_name: bigquery-public-data.thelook_ecommerce.products ;;
 
-dimension: id {
-primary_key: yes
-type: number
-sql: \${TABLE}.id ;;
-}
+  dimension: id {
+    primary_key: yes
+    type: number
+    sql: \${TABLE}.id ;;
+  }
 
-dimension: cost {
-type: number
-sql: \${TABLE}.cost ;;
-value_format_name: usd
-}
+  dimension: cost {
+    type: number
+    sql: \${TABLE}.cost ;;
+    value_format_name: usd
+  }
 
-dimension: category {
-type: string
-sql: \${TABLE}.category ;;
-}
+  dimension: category {
+    type: string
+    sql: \${TABLE}.category ;;
+  }
 
-dimension: name {
-type: string
-sql: \${TABLE}.name ;;
-}
+  dimension: name {
+    type: string
+    sql: \${TABLE}.name ;;
+  }
 
-dimension: brand {
-type: string
-sql: \${TABLE}.brand ;;
-}
+  dimension: brand {
+    type: string
+    sql: \${TABLE}.brand ;;
+  }
 
-dimension: retail_price {
-type: number
-sql: \${TABLE}.retail_price ;;
-value_format_name: usd
-}
+  dimension: retail_price {
+    type: number
+    sql: \${TABLE}.retail_price ;;
+    value_format_name: usd
+  }
 
-dimension: department {
-type: string
-sql: \${TABLE}.department ;;
-}
+  dimension: department {
+    type: string
+    sql: \${TABLE}.department ;;
+  }
 
-dimension: sku {
-type: string
-sql: \${TABLE}.sku ;;
-}
+  dimension: sku {
+    type: string
+    sql: \${TABLE}.sku ;;
+  }
 
-dimension: distribution_center_id {
-type: number
-sql: \${TABLE}.distribution_center_id ;;
-}
+  dimension: distribution_center_id {
+    type: number
+    sql: \${TABLE}.distribution_center_id ;;
+  }
 
-dimension: profit {
-label: "Profit"
-description: "Calculated profit based on retail price minus cost."
-type: number
-sql: \${retail_price} - \${cost} ;;
-value_format_name: usd
-}
+  dimension: profit {
+    label: "Profit"
+    description: "Calculated profit based on retail price minus cost."
+    type: number
+    sql: \${retail_price} - \${cost} ;;
+    value_format_name: usd
+  }
 
-measure: count {
-type: count
-drill_fields: [id, name, category]
-}
+  measure: count {
+    type: count
+    drill_fields: [id, name, category]
+  }
 
-measure: average_retail_price {
-label: "Average Retail Price"
-description: "Average retail price of products."
-type: average
-sql: \${retail_price} ;;
-value_format_name: usd
-}
+  measure: average_retail_price {
+    label: "Average Retail Price"
+    description: "Average retail price of products."
+    type: average
+    sql: \${retail_price} ;;
+    value_format_name: usd
+  }
 
-measure: total_retail_price {
-label: "Total Retail Price"
-description: "Total retail price of products."
-type: sum
-sql: \${retail_price} ;;
-value_format_name: usd
-}
+  measure: total_retail_price {
+    label: "Total Retail Price"
+    description: "Total retail price of products."
+    type: sum
+    sql: \${retail_price} ;;
+    value_format_name: usd
+  }
 
-measure: average_cost {
-label: "Average Cost"
-description: "Average cost of products."
-type: average
-sql: \${cost} ;;
-value_format_name: usd
-}
+  measure: average_cost {
+    label: "Average Cost"
+    description: "Average cost of products."
+    type: average
+    sql: \${cost} ;;
+    value_format_name: usd
+  }
 
-measure: total_cost {
-label: "Total Cost"
-description: "Total cost of products."
-type: sum
-sql: \${cost} ;;
-value_format_name: usd
-}
+  measure: total_cost {
+    label: "Total Cost"
+    description: "Total cost of products."
+    type: sum
+    sql: \${cost} ;;
+    value_format_name: usd
+  }
 
-measure: average_profit {
-label: "Average Profit"
-description: "Average profit per product."
-type: average
-sql: \${profit} ;;
-value_format_name: usd
-}
+  measure: average_profit {
+    label: "Average Profit"
+    description: "Average profit per product."
+    type: average
+    sql: \${profit} ;;
+    value_format_name: usd
+  }
 
-measure: total_profit {
-label: "Total Profit"
-description: "Total profit from all products."
-type: sum
-sql: \${profit} ;;
-value_format_name: usd
-}
+  measure: total_profit {
+    label: "Total Profit"
+    description: "Total profit from all products."
+    type: sum
+    sql: \${profit} ;;
+    value_format_name: usd
+  }
 
-dimension: retail_price_tier {
-label: "Retail Price Tier"
-description: "Tiered grouping of retail prices."
-type: tier
-tiers: [0, 25, 50, 75, 100, 200, 500]
-style: integer
-sql: \${retail_price} ;;
-}
+  dimension: retail_price_tier {
+    label: "Retail Price Tier"
+    description: "Tiered grouping of retail prices."
+    type: tier
+    tiers: [0, 25, 50, 75, 100, 200, 500]
+    style: integer
+    sql: \${retail_price} ;;
+  }
 
-dimension: cost_tier {
-label: "Cost Tier"
-description: "Tiered grouping of product costs."
-type: tier
-tiers: [0, 10, 20, 30, 40, 50]
-style: integer
-sql: \${cost} ;;
-}
+  dimension: cost_tier {
+    label: "Cost Tier"
+    description: "Tiered grouping of product costs."
+    type: tier
+    tiers: [0, 10, 20, 30, 40, 50]
+    style: integer
+    sql: \${cost} ;;
+  }
 
-dimension: profit_tier {
-label: "Profit Tier"
-description: "Tiered grouping of product profits."
-type: tier
-tiers: [-10, 0, 10, 20, 30, 40, 50, 100]
-style: integer
-sql: \${profit} ;;
-}
+  dimension: profit_tier {
+    label: "Profit Tier"
+    description: "Tiered grouping of product profits."
+    type: tier
+    tiers: [-10, 0, 10, 20, 30, 40, 50, 100]
+    style: integer
+    sql: \${profit} ;;
+  }
 }`,
     icon: <FileText size={16} className="text-[#5f6368]" />,
     preview: 'view: products {'
@@ -316,127 +316,127 @@ sql: \${profit} ;;
   {
     name: 'views/users.view',
     content: `view: users {
-sql_table_name: bigquery-public-data.thelook_ecommerce.users ;;
+  sql_table_name: bigquery-public-data.thelook_ecommerce.users ;;
 
-dimension: id {
-primary_key: yes
-type: number
-sql: \${TABLE}.id ;;
-}
+  dimension: id {
+    primary_key: yes
+    type: number
+    sql: \${TABLE}.id ;;
+  }
 
-dimension: first_name {
-type: string
-sql: \${TABLE}.first_name ;;
-}
+  dimension: first_name {
+    type: string
+    sql: \${TABLE}.first_name ;;
+  }
 
-dimension: last_name {
-type: string
-sql: \${TABLE}.last_name ;;
-}
+  dimension: last_name {
+    type: string
+    sql: \${TABLE}.last_name ;;
+  }
 
-dimension: email {
-type: string
-sql: \${TABLE}.email ;;
-}
+  dimension: email {
+    type: string
+    sql: \${TABLE}.email ;;
+  }
 
-dimension: age {
-type: number
-sql: \${TABLE}.age ;;
-}
+  dimension: age {
+    type: number
+    sql: \${TABLE}.age ;;
+  }
 
-dimension: gender {
-type: string
-sql: \${TABLE}.gender ;;
-}
+  dimension: gender {
+    type: string
+    sql: \${TABLE}.gender ;;
+  }
 
-dimension: state {
-type: string
-sql: \${TABLE}.state ;;
-}
+  dimension: state {
+    type: string
+    sql: \${TABLE}.state ;;
+  }
 
-dimension: street_address {
-type: string
-sql: \${TABLE}.street_address ;;
-}
+  dimension: street_address {
+    type: string
+    sql: \${TABLE}.street_address ;;
+  }
 
-dimension: postal_code {
-type: string
-sql: \${TABLE}.postal_code ;;
-}
+  dimension: postal_code {
+    type: string
+    sql: \${TABLE}.postal_code ;;
+  }
 
-dimension: city {
-type: string
-sql: \${TABLE}.city ;;
-}
+  dimension: city {
+    type: string
+    sql: \${TABLE}.city ;;
+  }
 
-dimension: country {
-type: string
-sql: \${TABLE}.country ;;
-}
+  dimension: country {
+    type: string
+    sql: \${TABLE}.country ;;
+  }
 
-dimension_group: location {
-type: location
-sql_latitude: \${TABLE}.latitude ;;
-sql_longitude: \${TABLE}.longitude ;;
-}
+  dimension_group: location {
+    type: location
+    sql_latitude: \${TABLE}.latitude ;;
+    sql_longitude: \${TABLE}.longitude ;;
+  }
 
-dimension: traffic_source {
-type: string
-sql: \${TABLE}.traffic_source ;;
-}
+  dimension: traffic_source {
+    type: string
+    sql: \${TABLE}.traffic_source ;;
+  }
 
-dimension_group: created {
-type: time
-timeframes: [raw, date, week, month, quarter, year]
-sql: \${TABLE}.created_at ;;
-}
+  dimension_group: created {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    sql: \${TABLE}.created_at ;;
+  }
 
-dimension: user_geom {
-type: string
-sql: \${TABLE}.user_geom ;;
-}
+  dimension: user_geom {
+    type: string
+    sql: \${TABLE}.user_geom ;;
+  }
 
-measure: count {
-type: count
-drill_fields: [id, first_name, last_name]
-}
+  measure: count {
+    type: count
+    drill_fields: [id, first_name, last_name]
+  }
 
-dimension: age_tier {
-label: "Age Tier"
-description: "Tiering of user ages for analysis."
-type: tier
-tiers: [0, 18, 25, 35, 50, 65, 100]
-style: integer
-sql: \${age} ;;
-}
+  dimension: age_tier {
+    label: "Age Tier"
+    description: "Tiering of user ages for analysis."
+    type: tier
+    tiers: [0, 18, 25, 35, 50, 65, 100]
+    style: integer
+    sql: \${age} ;;
+  }
 
-dimension: full_name {
-label: "Full Name"
-description: "Concatenation of first and last names."
-type: string
-sql: CONCAT(\${first_name}, " ", \${last_name}) ;;
-}
+  dimension: full_name {
+    label: "Full Name"
+    description: "Concatenation of first and last names."
+    type: string
+    sql: CONCAT(\${first_name}, " ", \${last_name}) ;;
+  }
 
-dimension: is_male {
-label: "Is Male"
-description: "Flag indicating if the user's gender is male."
-type: yesno
-sql: \${gender} = 'Male' ;;
-}
+  dimension: is_male {
+    label: "Is Male"
+    description: "Flag indicating if the user's gender is male."
+    type: yesno
+    sql: \${gender} = 'Male' ;;
+  }
 
-dimension: is_female {
-label: "Is Female"
-description: "Flag indicating if the user's gender is female."
-type: yesno
-sql: \${gender} = 'Female' ;;
-}
+  dimension: is_female {
+    label: "Is Female"
+    description: "Flag indicating if the user's gender is female."
+    type: yesno
+    sql: \${gender} = 'Female' ;;
+  }
 
-measure: average_age {
-label: "Average Age"
-description: "Average age of users."
-type: average
-sql: \${age} ;;
-}
+  measure: average_age {
+    label: "Average Age"
+    description: "Average age of users."
+    type: average
+    sql: \${age} ;;
+  }
 }`,
     icon: <FileText size={16} className="text-[#5f6368]" />,
     preview: 'view: users {'
