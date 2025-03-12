@@ -1,42 +1,42 @@
 /* Font fallbacks */
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Google Sans';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: local('Arial');
+  src: url('https://fonts.gstatic.com/s/googlesans/v45/4UaGrENHsxJlGDuGo1OIlL3Owps.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Google Sans';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: local('Arial Bold');
+  src: url('https://fonts.gstatic.com/s/googlesans/v45/4UabrENHsxJlGDuGo1OIlLU94YtzCwM.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Google Sans';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: local('Arial Bold');
+  src: url('https://fonts.gstatic.com/s/googlesans/v45/4UabrENHsxJlGDuGo1OIlLU94YtzCwM.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Google Sans';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: local('Arial Bold');
+  src: url('https://fonts.gstatic.com/s/googlesans/v45/4UabrENHsxJlGDuGo1OIlLU94YtzCwM.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Google Sans';
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: local('Arial Italic');
+  src: url('https://fonts.gstatic.com/s/googlesans/v45/4UaErENHsxJlGDuGo1OIlL3L8phULjtH.woff2') format('woff2');
 }
 
 /* Monospace font for code */
@@ -48,9 +48,9 @@
   src: local('Menlo'), local('Consolas'), local('Monaco'), local('Courier New');
 }
 
-/* Apply system fonts to all elements */
+/* Apply Google Sans to all elements except code */
 * {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 /* Apply monospace font to code elements */
