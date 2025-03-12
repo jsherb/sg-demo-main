@@ -30,9 +30,10 @@ function App() {
       <div className="h-screen flex flex-col">
         {/* Only show Header in non-Looker environments */}
         {!isExtension && <Header />}
-        {/* Only show TopNav and ProjectHeader in non-Looker environments */}
+        {/* Only show TopNav in non-Looker environments */}
         {!isExtension && <TopNav />}
-        {!isExtension && <ProjectHeader />}
+        {/* Always show ProjectHeader - this is the change */}
+        <ProjectHeader />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
           <MainContent />

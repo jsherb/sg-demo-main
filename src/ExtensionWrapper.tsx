@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ExtensionProvider } from '@looker/extension-sdk-react';
 import MainContent from './components/MainContent';
 import { Sidebar } from './components/Sidebar';
+import { ProjectHeader } from './components/ProjectHeader';
 
 // Custom error boundary to catch and handle errors in the extension
 class ExtensionErrorBoundary extends Component<
@@ -60,9 +61,13 @@ const ExtensionWrapper: React.FC = () => {
         requiredLookerVersion=">=21.0.0"
         chattyTimeout={-1} // Disable the chatty timeout to prevent connection issues
       >
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <MainContent />
+        <div className="flex flex-col h-screen">
+          {/* Include ProjectHeader in extension mode */}
+          <ProjectHeader />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <MainContent />
+          </div>
         </div>
       </ExtensionProvider>
     </ExtensionErrorBoundary>
