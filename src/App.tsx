@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 // Import Header but don't use it in Looker extension mode
 import { Header } from './components/Header';
 import { TopNav } from './components/TopNav';
@@ -9,45 +9,19 @@ import { ExtensionErrorHandler } from './components/ExtensionErrorHandler';
 
 // Check if we're running in Looker extension environment
 const isLookerExtension = () => {
-  // More reliable detection of Looker extension environment
+  // Simple check based on URL
   return window.location.href.includes('looker') || 
-         window.location.href.includes('extension') ||
-         window.location.hostname === 'localhost' ||
-         typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined';
+         window.location.href.includes('extension');
 };
 
 function App() {
-  const [sdkAvailable, setSdkAvailable] = useState(false);
-  const [isExtension, setIsExtension] = useState(isLookerExtension());
-
+  // Determine if we're in extension mode once at startup
+  const isExtension = isLookerExtension();
+  
   // Log environment information for debugging
-  useEffect(() => {
-    console.log('App initialized');
-    console.log('Running in Looker extension environment:', isExtension);
-    console.log('Window location:', window.location.href);
-    
-    // Check SDK availability
-    const checkSdk = () => {
-      const available = typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined';
-      console.log('Looker SDK available:', available);
-      setSdkAvailable(available);
-      
-      // Try to access the Looker SDK
-      if (available && window.__LOOKER_EXTENSION_SDK__) {
-        try {
-          window.__LOOKER_EXTENSION_SDK__.lookerHostData();
-          console.log('Looker SDK initialized successfully');
-        } catch (error) {
-          console.error('Error accessing Looker SDK:', error);
-        }
-      } else if (isExtension) {
-        // If we're in an extension but SDK is not available, try again after a delay
-        setTimeout(checkSdk, 1000);
-      }
-    };
-    
-    checkSdk();
-  }, [isExtension]);
+  console.log('App initialized');
+  console.log('Running in Looker extension environment:', isExtension);
+  console.log('Window location:', window.location.href);
 
   return (
     <ExtensionErrorHandler>
