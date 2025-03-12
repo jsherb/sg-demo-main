@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // Import Header but don't use it in Looker extension mode
 import { Header } from './components/Header';
 import { TopNav } from './components/TopNav';
@@ -19,9 +19,29 @@ function App() {
   const isExtension = isLookerExtension();
   
   // Log environment information for debugging
-  console.log('App initialized');
-  console.log('Running in Looker extension environment:', isExtension);
-  console.log('Window location:', window.location.href);
+  useEffect(() => {
+    console.log('App initialized');
+    console.log('Running in Looker extension environment:', isExtension);
+    console.log('Window location:', window.location.href);
+    
+    // Set up a ping interval to keep the connection alive
+    if (isExtension) {
+      const pingInterval = setInterval(() => {
+        // Send a message to the parent window to keep the connection alive
+        if (window.parent && window.parent !== window) {
+          try {
+            window.parent.postMessage({ type: 'EXTENSION_PING' }, '*');
+          } catch (error) {
+            console.error('Error sending ping to parent window:', error);
+          }
+        }
+      }, 5000); // Send ping every 5 seconds
+      
+      return () => {
+        clearInterval(pingInterval);
+      };
+    }
+  }, [isExtension]);
 
   return (
     <ExtensionErrorHandler>
