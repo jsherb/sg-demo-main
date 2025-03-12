@@ -39,7 +39,23 @@
   src: local('Arial Italic');
 }
 
+/* Monospace font for code */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Menlo'), local('Consolas'), local('Monaco'), local('Courier New');
+}
+
 /* Apply system fonts to all elements */
 * {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+/* Apply monospace font to code elements */
+code, pre, .code-editor, .font-mono {
+  font-family: 'Roboto Mono', Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+  font-size: 13px;
+  line-height: 1.5;
 } 

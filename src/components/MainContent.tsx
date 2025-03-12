@@ -133,7 +133,7 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
           ))}
         </div>
         {/* Code content */}
-        <div className="flex-1 font-mono text-[13px] pl-2 text-[#202124] whitespace-pre m-0 p-0 overflow-auto">
+        <div className="flex-1 font-mono text-[13px] pl-2 text-[#202124] whitespace-pre m-0 p-0 overflow-auto code-editor">
           {lines.map((line, i) => (
             <div key={i} className="h-[22px] leading-[22px] m-0 p-0">
               {renderLine(line)}
@@ -254,27 +254,15 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
 
   return (
     <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
-      <div className="p-3 bg-[#f8fbff] border-b border-[#dadce0]">
-        <p className="text-[14px] text-[#202124]">{title}</p>
+      <div className="h-10 flex items-center px-4 text-[13px] text-black font-['Noto_Sans'] border-b border-[#dadce0] bg-[#f8f9fa]">
+        {title}
       </div>
-      <div className="p-3 border-b border-[#dadce0]">
-        <div className="text-[13px] text-black font-['Noto_Sans'] mb-2">{file.name}</div>
-        <div className="flex h-[200px] overflow-hidden p-0 m-0 border border-[#dadce0] rounded">
-          {/* Line numbers */}
-          <div className="w-[48px] flex-shrink-0 flex flex-col text-[#80868b] text-right pr-2 select-none border-r border-[#dadce0] bg-[#f8f9fa] m-0 p-0 overflow-hidden">
-            {lines.map((_, i) => (
-              <div key={i} className="h-[22px] leading-[22px] m-0 p-0">{i + 1}</div>
-            ))}
+      <div className="p-4 font-mono text-[13px] text-[#202124] whitespace-pre overflow-auto max-h-[300px] code-editor">
+        {lines.map((line, i) => (
+          <div key={i} className="leading-[22px]">
+            {renderLine(line)}
           </div>
-          {/* Code content */}
-          <div className="flex-1 font-mono text-[13px] pl-2 text-[#202124] whitespace-pre m-0 p-0 overflow-auto">
-            {lines.map((line, i) => (
-              <div key={i} className="h-[22px] leading-[22px] m-0 p-0">
-                {renderLine(line)}
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -1027,7 +1015,7 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">ecomm.model</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3">
+                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code>{`connection: "big_query_connection"
 
 include: "/views/**/*.view"
@@ -1087,7 +1075,7 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/order_items.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3">
+                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code>{`view: order_items {
   sql_table_name: bigquery-public-data.thelook_ecommerce.order_items ;;
 
@@ -1168,7 +1156,7 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/products.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3">
+                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code>{`view: products {
   sql_table_name: bigquery-public-data.thelook_ecommerce.products ;;
 
@@ -1245,7 +1233,7 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/users.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3">
+                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code>{`view: users {
   sql_table_name: bigquery-public-data.thelook_ecommerce.users ;;
 
