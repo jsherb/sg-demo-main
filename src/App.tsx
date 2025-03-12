@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // Import Header but don't use it in Looker extension mode
 import { Header } from './components/Header';
 import { TopNav } from './components/TopNav';
@@ -17,6 +17,23 @@ const isLookerExtension = () => {
 };
 
 function App() {
+  // Log environment information for debugging
+  useEffect(() => {
+    console.log('App initialized');
+    console.log('Running in Looker extension environment:', isLookerExtension());
+    console.log('Window location:', window.location.href);
+    console.log('Looker SDK available:', typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined');
+    
+    // Try to access the Looker SDK
+    try {
+      if (window.__LOOKER_EXTENSION_SDK__) {
+        console.log('Looker SDK initialized successfully');
+      }
+    } catch (error) {
+      console.error('Error accessing Looker SDK:', error);
+    }
+  }, []);
+
   return (
     <ExtensionErrorHandler>
       <div className="h-screen flex flex-col">

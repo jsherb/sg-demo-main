@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ExtensionErrorHandlerProps {
   children: React.ReactNode;
@@ -9,11 +9,87 @@ interface LookerExtensionErrorEvent {
   type?: string;
   error?: string;
   chattyError?: string;
+  message?: string | any;
+  detail?: any;
 }
 
 export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ children }) => {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const pingIntervalRef = useRef<number | null>(null);
+  const reconnectTimeoutRef = useRef<number | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const MAX_RECONNECT_ATTEMPTS = 5;
+
+  // Helper function to check if a string contains a substring
+  const containsSubstring = (str: any, substr: string): boolean => {
+    if (typeof str === 'string') {
+      return str.indexOf(substr) !== -1;
+    }
+    return false;
+  };
+
+  // Function to attempt reconnection
+  const attemptReconnect = () => {
+    if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
+      console.log('Max reconnection attempts reached');
+      setHasError(true);
+      setErrorMessage('Unable to reconnect to Looker extension after multiple attempts. Please refresh the page.');
+      return;
+    }
+
+    reconnectAttemptsRef.current += 1;
+    console.log(`Attempting to reconnect (attempt ${reconnectAttemptsRef.current})`);
+    
+    // Clear existing ping interval
+    if (pingIntervalRef.current) {
+      window.clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+
+    // Try to reconnect by reloading SDK data
+    try {
+      if (window.__LOOKER_EXTENSION_SDK__) {
+        window.__LOOKER_EXTENSION_SDK__.lookerHostData();
+        console.log('Reconnection successful');
+        
+        // Reset reconnect attempts on success
+        reconnectAttemptsRef.current = 0;
+        
+        // Restart ping interval
+        startPingInterval();
+      }
+    } catch (error) {
+      console.log('Reconnection failed:', error);
+      
+      // Schedule another reconnection attempt
+      reconnectTimeoutRef.current = window.setTimeout(() => {
+        attemptReconnect();
+      }, 5000); // Wait 5 seconds before trying again
+    }
+  };
+
+  // Function to start the ping interval
+  const startPingInterval = () => {
+    // Clear any existing interval
+    if (pingIntervalRef.current) {
+      window.clearInterval(pingIntervalRef.current);
+    }
+
+    // Set up a new ping interval
+    pingIntervalRef.current = window.setInterval(() => {
+      try {
+        // Simple ping to keep connection alive
+        if (window.__LOOKER_EXTENSION_SDK__) {
+          console.log('Sending ping to Looker host');
+          window.__LOOKER_EXTENSION_SDK__.lookerHostData();
+        }
+      } catch (error) {
+        console.log('Ping error:', error);
+        attemptReconnect();
+      }
+    }, 10000); // Ping every 10 seconds
+  };
 
   useEffect(() => {
     // Listen for extension connection errors
@@ -24,14 +100,15 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
       const data = event.data as LookerExtensionErrorEvent;
       
       if (
-        (data && 
-         (data.type === 'extension_error' || 
-          data.error === 'connectionTimeout' || 
-          data.chattyError === 'connectionTimeout'))
+        data && 
+        (data.type === 'extension_error' || 
+         data.error === 'connectionTimeout' || 
+         data.chattyError === 'connectionTimeout' ||
+         containsSubstring(data, 'connection') ||
+         containsSubstring(data.message, 'connection'))
       ) {
-        console.log('Connection error detected');
-        setHasError(true);
-        setErrorMessage('Connection to Looker extension has timed out. Please refresh the page.');
+        console.log('Connection error detected in message event');
+        attemptReconnect();
       }
     };
 
@@ -45,37 +122,52 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
         detail && 
         (detail.type === 'extension_error' || 
          detail.error === 'connectionTimeout' || 
-         detail.chattyError === 'connectionTimeout')
+         detail.chattyError === 'connectionTimeout' ||
+         containsSubstring(detail, 'connection'))
       ) {
         console.log('Connection error detected in custom event');
-        setHasError(true);
-        setErrorMessage('Connection to Looker extension has timed out. Please refresh the page.');
+        attemptReconnect();
       }
     };
 
     // Handle global errors
     const handleError = (event: ErrorEvent) => {
       console.log('Error event:', event);
-      setHasError(true);
-      setErrorMessage('An error occurred in the extension. Please refresh the page.');
+      
+      // Check if the error is related to connection issues
+      if (containsSubstring(event.message, 'connection') || 
+          containsSubstring(event.message, 'network') ||
+          containsSubstring(event.message, 'timeout')) {
+        console.log('Connection-related error detected');
+        attemptReconnect();
+      } else {
+        // For other errors, just show the error message
+        setHasError(true);
+        setErrorMessage('An error occurred in the extension. Please refresh the page.');
+      }
     };
 
-    // Set up a ping mechanism to keep the connection alive
-    const pingInterval = setInterval(() => {
-      try {
-        // Simple ping to keep connection alive
-        if (window.__LOOKER_EXTENSION_SDK__) {
-          console.log('Sending ping to Looker host');
-          window.__LOOKER_EXTENSION_SDK__.lookerHostData();
-        }
-      } catch (error) {
-        console.log('Ping error:', error);
+    // Handle unhandled rejections
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.log('Unhandled rejection:', event);
+      
+      // Check if the rejection is related to connection issues
+      const reason = event.reason?.toString() || '';
+      if (containsSubstring(reason, 'connection') || 
+          containsSubstring(reason, 'network') || 
+          containsSubstring(reason, 'timeout')) {
+        console.log('Connection-related rejection detected');
+        attemptReconnect();
       }
-    }, 15000); // Ping every 15 seconds (more frequent)
+    };
+
+    // Start the ping interval
+    startPingInterval();
 
     // Add event listeners
     window.addEventListener('message', handleConnectionError);
     window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
     window.addEventListener('extension_error', handleCustomEvent as EventListener);
     window.addEventListener('connectionTimeout', handleCustomEvent as EventListener);
 
@@ -83,9 +175,18 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
     return () => {
       window.removeEventListener('message', handleConnectionError);
       window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       window.removeEventListener('extension_error', handleCustomEvent as EventListener);
       window.removeEventListener('connectionTimeout', handleCustomEvent as EventListener);
-      clearInterval(pingInterval);
+      
+      // Clear intervals and timeouts
+      if (pingIntervalRef.current) {
+        window.clearInterval(pingIntervalRef.current);
+      }
+      
+      if (reconnectTimeoutRef.current) {
+        window.clearTimeout(reconnectTimeoutRef.current);
+      }
     };
   }, []);
 
