@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, HelpCircle, User } from 'lucide-react';
-// Update the import path to use a relative path that will work with the new webpack config
-import lookerLogo from '../assets/looker_logo.png';
+// Remove the import and use a direct reference to the image
+// import lookerLogo from '../assets/looker_logo.png';
 
 export const TopNav = () => {
   return (
@@ -10,7 +10,7 @@ export const TopNav = () => {
         <button className="p-1.5 hover:bg-gray-100 rounded">
           <Menu className="text-gray-600" size={20} />
         </button>
-        <img src={lookerLogo} alt="Looker" className="h-10" />
+        <img src="./assets/looker_logo.png" alt="Looker" className="h-10" />
       </div>
       <div className="flex items-center space-x-2">
         <button className="p-1.5 hover:bg-gray-100 rounded">

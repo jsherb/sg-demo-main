@@ -4,43 +4,87 @@ interface ExtensionErrorHandlerProps {
   children: React.ReactNode;
 }
 
+// Define custom event types for Looker extension errors
+interface LookerExtensionErrorEvent {
+  type?: string;
+  error?: string;
+  chattyError?: string;
+}
+
 export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ children }) => {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     // Listen for extension connection errors
-    const handleConnectionError = (event: any) => {
-      if (event.detail?.type === 'extension_error' || 
-          event.detail?.error === 'connectionTimeout' ||
-          event.detail?.chattyError === 'connectionTimeout') {
+    const handleConnectionError = (event: MessageEvent) => {
+      console.log('Message event received:', event);
+      
+      // Check for connection timeout in various formats
+      const data = event.data as LookerExtensionErrorEvent;
+      
+      if (
+        (data && 
+         (data.type === 'extension_error' || 
+          data.error === 'connectionTimeout' || 
+          data.chattyError === 'connectionTimeout'))
+      ) {
+        console.log('Connection error detected');
         setHasError(true);
         setErrorMessage('Connection to Looker extension has timed out. Please refresh the page.');
       }
     };
 
-    window.addEventListener('message', handleConnectionError);
-    window.addEventListener('error', () => {
+    // Handle custom events that might be dispatched by Looker
+    const handleCustomEvent = (event: CustomEvent) => {
+      console.log('Custom event received:', event);
+      
+      const detail = event.detail as LookerExtensionErrorEvent;
+      
+      if (
+        detail && 
+        (detail.type === 'extension_error' || 
+         detail.error === 'connectionTimeout' || 
+         detail.chattyError === 'connectionTimeout')
+      ) {
+        console.log('Connection error detected in custom event');
+        setHasError(true);
+        setErrorMessage('Connection to Looker extension has timed out. Please refresh the page.');
+      }
+    };
+
+    // Handle global errors
+    const handleError = (event: ErrorEvent) => {
+      console.log('Error event:', event);
       setHasError(true);
       setErrorMessage('An error occurred in the extension. Please refresh the page.');
-    });
+    };
 
     // Set up a ping mechanism to keep the connection alive
     const pingInterval = setInterval(() => {
-      // Send a ping to the Looker extension host
-      if (typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined') {
-        try {
-          // Simple ping to keep connection alive
+      try {
+        // Simple ping to keep connection alive
+        if (window.__LOOKER_EXTENSION_SDK__) {
+          console.log('Sending ping to Looker host');
           window.__LOOKER_EXTENSION_SDK__.lookerHostData();
-        } catch (error) {
-          console.log('Ping error:', error);
         }
+      } catch (error) {
+        console.log('Ping error:', error);
       }
-    }, 30000); // Ping every 30 seconds
+    }, 15000); // Ping every 15 seconds (more frequent)
 
+    // Add event listeners
+    window.addEventListener('message', handleConnectionError);
+    window.addEventListener('error', handleError);
+    window.addEventListener('extension_error', handleCustomEvent as EventListener);
+    window.addEventListener('connectionTimeout', handleCustomEvent as EventListener);
+
+    // Cleanup
     return () => {
       window.removeEventListener('message', handleConnectionError);
-      window.removeEventListener('error', () => {});
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('extension_error', handleCustomEvent as EventListener);
+      window.removeEventListener('connectionTimeout', handleCustomEvent as EventListener);
       clearInterval(pingInterval);
     };
   }, []);

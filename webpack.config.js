@@ -22,8 +22,7 @@ module.exports = {
       type: 'umd',
       name: 'LookerExtension'
     },
-    globalObject: 'this',
-    assetModuleFilename: 'assets/[hash][ext][query]'
+    globalObject: 'this'
   },
   module: {
     rules: [
@@ -44,9 +43,6 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
-        generator: {
-          filename: 'assets/images/[hash][ext][query]'
-        }
       },
     ]
   },
@@ -76,6 +72,7 @@ module.exports = {
       template: './index.html',
       filename: 'index.html'
     }),
+    // Copy assets directly to the dist folder
     new CopyPlugin({
       patterns: [
         {
