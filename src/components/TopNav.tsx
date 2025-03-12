@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu, HelpCircle, User } from 'lucide-react';
-// Import the logo image
+// Update the import path to use a relative path that will work with the new webpack config
 import lookerLogo from '../assets/looker_logo.png';
 
 export const TopNav = () => {

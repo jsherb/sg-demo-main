@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const dotenv = require('dotenv');
+const CopyPlugin = require('copy-webpack-plugin');
 
 // Load environment variables from .env file
 const env = dotenv.config().parsed || {};
@@ -16,12 +17,13 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/',
+    publicPath: './',
     library: {
       type: 'umd',
       name: 'LookerExtension'
     },
-    globalObject: 'this'
+    globalObject: 'this',
+    assetModuleFilename: 'assets/[hash][ext][query]'
   },
   module: {
     rules: [
@@ -42,6 +44,9 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
+        generator: {
+          filename: 'assets/images/[hash][ext][query]'
+        }
       },
     ]
   },
@@ -70,6 +75,14 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html',
       filename: 'index.html'
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/assets',
+          to: 'assets'
+        }
+      ]
     })
   ],
   devServer: {
