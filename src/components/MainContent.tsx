@@ -325,25 +325,8 @@ const MainContent = () => {
         }
       }, 10000); // Send heartbeat every 10 seconds
       
-      // Set up a global error handler for React Router errors
-      const originalError = console.error;
-      console.error = (...args) => {
-        // Check if this is a React Router error
-        const errorString = args.join(' ');
-        if (errorString.includes('useHistory') || errorString.includes('react-router')) {
-          console.log('Suppressing React Router error:', errorString);
-          // Don't propagate React Router errors to prevent crashing
-          return;
-        }
-        
-        // For all other errors, use the original console.error
-        originalError.apply(console, args);
-      };
-      
       return () => {
         clearInterval(heartbeatInterval);
-        // Restore original console.error
-        console.error = originalError;
       };
     } else {
       console.log('Not running in a Looker extension environment');

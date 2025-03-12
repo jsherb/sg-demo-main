@@ -1,8 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ExtensionProvider } from '@looker/extension-sdk-react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
 import MainContent from './components/MainContent';
-import { RouterCompat } from './looker-compat';
 
 // Custom error boundary to catch and handle errors in the extension
 class ExtensionErrorBoundary extends Component<
@@ -57,18 +55,12 @@ class ExtensionErrorBoundary extends Component<
 const ExtensionWrapper: React.FC = () => {
   return (
     <ExtensionErrorBoundary>
-      <HashRouter>
-        <RouterCompat>
-          <ExtensionProvider
-            requiredLookerVersion=">=21.0.0"
-            chattyTimeout={-1} // Disable the chatty timeout to prevent connection issues
-          >
-            <Routes>
-              <Route path="*" element={<MainContent />} />
-            </Routes>
-          </ExtensionProvider>
-        </RouterCompat>
-      </HashRouter>
+      <ExtensionProvider
+        requiredLookerVersion=">=21.0.0"
+        chattyTimeout={-1} // Disable the chatty timeout to prevent connection issues
+      >
+        <MainContent />
+      </ExtensionProvider>
     </ExtensionErrorBoundary>
   );
 };

@@ -1,12 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// Import our patch first to ensure it's loaded before any other modules
-import './looker-compat/patch';
-// Apply the monkey patch
-import { applyMonkeyPatch } from './looker-compat';
-// Apply the monkey patch before importing any other modules
-applyMonkeyPatch();
-
 import App from './App';
 import ExtensionWrapper from './ExtensionWrapper';
 import './fonts.css'; // Import fonts first
