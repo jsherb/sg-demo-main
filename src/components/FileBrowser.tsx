@@ -518,7 +518,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
 
   return (
     <div className="w-[240px] border-r border-[#dadce0] bg-white">
-      <div className="h-12 flex items-center text-[13px] font-medium px-4 border-b border-[#dadce0]">
+      <div className="h-12 flex items-center text-[13px] font-medium px-4 border-b border-[#dadce0] google-sans">
         File Browser
       </div>
       <div className="p-2 h-[calc(100vh-157px)] overflow-y-auto">
@@ -527,7 +527,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
           <button
             key={file.name}
             className={clsx(
-              "flex items-center gap-2 w-full text-left p-1.5 rounded",
+              "flex items-center gap-2 w-full text-left p-1.5 rounded google-sans",
               selectedFile === file.name ? 'bg-[#e8f0fe] text-[#202124]' : 'text-[#5f6368] hover:bg-[#f1f3f4]'
             )}
             onClick={() => onFileSelect(file)}
@@ -540,7 +540,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
         {/* Views folder */}
         <div className="mt-2">
           <button
-            className="flex items-center gap-1 w-full text-left p-1.5 text-[#5f6368] hover:bg-[#f1f3f4] rounded"
+            className="flex items-center gap-1 w-full text-left p-1.5 text-[#5f6368] hover:bg-[#f1f3f4] rounded google-sans"
             onClick={() => toggleFolder('views')}
           >
             <span className="w-4 text-[18px] leading-none">{expandedFolders.includes('views') ? '▾' : '▸'}</span>
@@ -553,7 +553,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
                 <button
                   key={file.name}
                   className={clsx(
-                    "flex items-center gap-2 w-full text-left p-1.5 rounded",
+                    "flex items-center gap-2 w-full text-left p-1.5 rounded google-sans",
                     selectedFile === `views/${file.name}` ? 'bg-[#e8f0fe] text-[#202124]' : 'text-[#5f6368] hover:bg-[#f1f3f4]'
                   )}
                   onClick={() => onFileSelect(files.find(f => f.name === `views/${file.name}`)!)}
@@ -569,7 +569,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ onFileSelect, selected
         {/* Dashboards folder */}
         <div className="mt-2">
           <button
-            className="flex items-center gap-1 w-full text-left p-1.5 text-[#5f6368] hover:bg-[#f1f3f4] rounded"
+            className="flex items-center gap-1 w-full text-left p-1.5 text-[#5f6368] hover:bg-[#f1f3f4] rounded google-sans"
             onClick={() => toggleFolder('dashboards')}
           >
             <span className="w-4 text-[18px] leading-none">{expandedFolders.includes('dashboards') ? '▾' : '▸'}</span>

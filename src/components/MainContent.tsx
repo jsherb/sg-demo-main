@@ -211,7 +211,7 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
 
   return (
     <div className="flex-1 bg-white overflow-hidden">
-      <div className="h-12 flex items-center px-4 text-[13px] text-black font-['Noto_Sans'] border-b border-[#dadce0]">
+      <div className="h-12 flex items-center px-4 text-[13px] text-black google-sans border-b border-[#dadce0]">
         {file.name}
       </div>
       <div className="flex h-[calc(100vh-157px)] overflow-hidden p-0 m-0">
@@ -432,7 +432,7 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
 
   return (
     <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
-      <div className="h-10 flex items-center px-4 text-[13px] text-black font-['Noto_Sans'] border-b border-[#dadce0] bg-[#f8f9fa]">
+      <div className="h-10 flex items-center px-4 text-[13px] text-black google-sans border-b border-[#dadce0] bg-[#f8f9fa]">
         {title}
       </div>
       <div className="p-4 font-mono text-[13px] text-[#202124] whitespace-pre overflow-auto max-h-[300px] code-editor">
@@ -1176,7 +1176,7 @@ explore: order_items {
                         {!showFileSnippets ? (
                           <div>
                             <div className="p-4 bg-[#f8fbff] border border-[#dadce0] rounded-lg mb-4">
-                              <p className="text-[14px] text-[#202124]">
+                              <p className="text-[14px] text-[#202124] google-sans">
                                 Based on your data and requirements, I've generated the following LookML files. 
                                 Each file can be previewed below. You can insert all files at once or provide feedback on individual files.
                               </p>
@@ -1185,7 +1185,7 @@ explore: order_items {
                             {/* Model File */}
                             <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
                               <div className="p-4 bg-[#f8fbff] border-b border-[#dadce0]">
-                                <p className="text-[14px] text-[#202124]">
+                                <p className="text-[14px] text-[#202124] google-sans">
                                   <span className="font-medium">Model File:</span> Defines the relationships between your views and establishes your first Explore.
                                 </p>
                               </div>
@@ -1245,13 +1245,13 @@ explore: order_items {
                             {/* Order Items View */}
                             <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
                               <div className="p-4 bg-[#f8fbff] border-b border-[#dadce0]">
-                                <p className="text-[14px] text-[#202124]">
+                                <p className="text-[14px] text-[#202124] google-sans">
                                   <span className="font-medium">Order Items View:</span> Contains order line item data with dimensions and measures for analysis.
                                 </p>
                               </div>
 
                               <div className="p-4 border-b border-[#dadce0]">
-                                <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/order_items.view</div>
+                                <div className="text-[13px] text-[#5f6368] font-mono mb-2 model-header">views/order_items.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
                                   <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code className="font-mono">{`view: order_items {
@@ -1326,13 +1326,13 @@ explore: order_items {
                             {/* Products View */}
                             <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
                               <div className="p-4 bg-[#f8fbff] border-b border-[#dadce0]">
-                                <p className="text-[14px] text-[#202124]">
+                                <p className="text-[14px] text-[#202124] google-sans">
                                   <span className="font-medium">Products View:</span> Contains product catalog information with dimensions and measures for product analysis.
                                 </p>
                               </div>
 
                               <div className="p-4 border-b border-[#dadce0]">
-                                <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/products.view</div>
+                                <div className="text-[13px] text-[#5f6368] font-mono mb-2 model-header">views/products.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
                                   <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code className="font-mono">{`view: products {
@@ -1403,13 +1403,13 @@ explore: order_items {
                             {/* Users View */}
                             <div className="bg-white rounded-lg border border-[#dadce0] overflow-hidden mb-4">
                               <div className="p-4 bg-[#f8fbff] border-b border-[#dadce0]">
-                                <p className="text-[14px] text-[#202124]">
+                                <p className="text-[14px] text-[#202124] google-sans">
                                   <span className="font-medium">Users View:</span> Contains customer information with dimensions and measures for user analysis.
                                 </p>
                               </div>
 
                               <div className="p-4 border-b border-[#dadce0]">
-                                <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/users.view</div>
+                                <div className="text-[13px] text-[#5f6368] font-mono mb-2 model-header">views/users.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
                                   <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
                                     <code className="font-mono">{`view: users {

@@ -15,21 +15,49 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Force Google Sans for file names */
-.text-\[\#5f6368\].font-mono {
+/* Universal Google Sans class */
+.google-sans {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Force Google Sans for file names */
+.text-\[\#5f6368\].font-mono,
+div.text-\[\#5f6368\].font-mono,
+.font-\[\'Noto_Sans\'\],
+div.font-\[\'Noto_Sans\'\] {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-weight: 500 !important;
 }
 
 /* Specifically target the model header */
 div[class*="text-[#5f6368]"][class*="font-mono"] {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   font-size: 13px !important;
+  font-weight: 500 !important;
 }
 
 /* Direct targeting of model header */
 .model-header {
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* Target file snippet titles */
+.h-10.flex.items-center.px-4.text-\[13px\].text-black.font-\[\'Noto_Sans\'\].border-b.border-\[#dadce0\].bg-\[#f8f9fa\] {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Target file explanation text */
+.p-4.bg-\[#f8fbff\].border-b.border-\[#dadce0\] p.text-\[14px\].text-\[#202124\],
+.p-4.bg-\[#f8fbff\].border.border-\[#dadce0\].rounded-lg p.text-\[14px\].text-\[#202124\] {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Ensure all font-medium spans use Google Sans */
+span.font-medium {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   font-weight: 500 !important;
 }
 
