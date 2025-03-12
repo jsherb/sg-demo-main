@@ -20,6 +20,7 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const MAX_RECONNECT_ATTEMPTS = 5;
+  const isInitializedRef = useRef(false);
 
   // Helper function to check if a string contains a substring
   const containsSubstring = (str: any, substr: string): boolean => {
@@ -58,6 +59,14 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
         
         // Restart ping interval
         startPingInterval();
+      } else {
+        // If SDK is not available, try to reload the page after a delay
+        if (reconnectAttemptsRef.current >= 3) {
+          console.log('SDK not available after multiple attempts, reloading page');
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
       }
     } catch (error) {
       console.log('Reconnection failed:', error);
@@ -83,15 +92,52 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
         if (window.__LOOKER_EXTENSION_SDK__) {
           console.log('Sending ping to Looker host');
           window.__LOOKER_EXTENSION_SDK__.lookerHostData();
+        } else {
+          console.log('SDK not available during ping');
+          attemptReconnect();
         }
       } catch (error) {
         console.log('Ping error:', error);
         attemptReconnect();
       }
-    }, 10000); // Ping every 10 seconds
+    }, 5000); // Ping every 5 seconds (more frequent)
+  };
+
+  // Initialize the SDK connection
+  const initializeSDK = () => {
+    if (isInitializedRef.current) return;
+    
+    console.log('Initializing SDK connection');
+    isInitializedRef.current = true;
+    
+    // Try to access the SDK
+    try {
+      if (window.__LOOKER_EXTENSION_SDK__) {
+        console.log('SDK available, initializing connection');
+        window.__LOOKER_EXTENSION_SDK__.lookerHostData();
+        startPingInterval();
+      } else {
+        console.log('SDK not available during initialization');
+        // Wait a bit and try again
+        setTimeout(() => {
+          isInitializedRef.current = false;
+          initializeSDK();
+        }, 1000);
+      }
+    } catch (error) {
+      console.log('SDK initialization error:', error);
+      // Wait a bit and try again
+      setTimeout(() => {
+        isInitializedRef.current = false;
+        initializeSDK();
+      }, 1000);
+    }
   };
 
   useEffect(() => {
+    // Initialize the SDK connection
+    initializeSDK();
+    
     // Listen for extension connection errors
     const handleConnectionError = (event: MessageEvent) => {
       console.log('Message event received:', event);
@@ -137,7 +183,8 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
       // Check if the error is related to connection issues
       if (containsSubstring(event.message, 'connection') || 
           containsSubstring(event.message, 'network') ||
-          containsSubstring(event.message, 'timeout')) {
+          containsSubstring(event.message, 'timeout') ||
+          containsSubstring(event.message, 'Receiving end does not exist')) {
         console.log('Connection-related error detected');
         attemptReconnect();
       } else {
@@ -155,14 +202,12 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
       const reason = event.reason?.toString() || '';
       if (containsSubstring(reason, 'connection') || 
           containsSubstring(reason, 'network') || 
-          containsSubstring(reason, 'timeout')) {
+          containsSubstring(reason, 'timeout') ||
+          containsSubstring(reason, 'Receiving end does not exist')) {
         console.log('Connection-related rejection detected');
         attemptReconnect();
       }
     };
-
-    // Start the ping interval
-    startPingInterval();
 
     // Add event listeners
     window.addEventListener('message', handleConnectionError);
@@ -171,6 +216,19 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
     window.addEventListener('extension_error', handleCustomEvent as EventListener);
     window.addEventListener('connectionTimeout', handleCustomEvent as EventListener);
 
+    // Listen for runtime.lastError
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      const errorMessage = args.join(' ');
+      if (containsSubstring(errorMessage, 'Unchecked runtime.lastError') ||
+          containsSubstring(errorMessage, 'Could not establish connection') ||
+          containsSubstring(errorMessage, 'Receiving end does not exist')) {
+        console.log('Runtime lastError detected:', errorMessage);
+        attemptReconnect();
+      }
+      originalConsoleError.apply(console, args);
+    };
+
     // Cleanup
     return () => {
       window.removeEventListener('message', handleConnectionError);
@@ -178,6 +236,9 @@ export const ExtensionErrorHandler: React.FC<ExtensionErrorHandlerProps> = ({ ch
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       window.removeEventListener('extension_error', handleCustomEvent as EventListener);
       window.removeEventListener('connectionTimeout', handleCustomEvent as EventListener);
+      
+      // Restore original console.error
+      console.error = originalConsoleError;
       
       // Clear intervals and timeouts
       if (pingIntervalRef.current) {

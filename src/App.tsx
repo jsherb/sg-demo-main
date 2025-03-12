@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 // Import Header but don't use it in Looker extension mode
 import { Header } from './components/Header';
 import { TopNav } from './components/TopNav';
@@ -17,31 +17,46 @@ const isLookerExtension = () => {
 };
 
 function App() {
+  const [sdkAvailable, setSdkAvailable] = useState(false);
+  const [isExtension, setIsExtension] = useState(isLookerExtension());
+
   // Log environment information for debugging
   useEffect(() => {
     console.log('App initialized');
-    console.log('Running in Looker extension environment:', isLookerExtension());
+    console.log('Running in Looker extension environment:', isExtension);
     console.log('Window location:', window.location.href);
-    console.log('Looker SDK available:', typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined');
     
-    // Try to access the Looker SDK
-    try {
-      if (window.__LOOKER_EXTENSION_SDK__) {
-        console.log('Looker SDK initialized successfully');
+    // Check SDK availability
+    const checkSdk = () => {
+      const available = typeof window.__LOOKER_EXTENSION_SDK__ !== 'undefined';
+      console.log('Looker SDK available:', available);
+      setSdkAvailable(available);
+      
+      // Try to access the Looker SDK
+      if (available && window.__LOOKER_EXTENSION_SDK__) {
+        try {
+          window.__LOOKER_EXTENSION_SDK__.lookerHostData();
+          console.log('Looker SDK initialized successfully');
+        } catch (error) {
+          console.error('Error accessing Looker SDK:', error);
+        }
+      } else if (isExtension) {
+        // If we're in an extension but SDK is not available, try again after a delay
+        setTimeout(checkSdk, 1000);
       }
-    } catch (error) {
-      console.error('Error accessing Looker SDK:', error);
-    }
-  }, []);
+    };
+    
+    checkSdk();
+  }, [isExtension]);
 
   return (
     <ExtensionErrorHandler>
       <div className="h-screen flex flex-col">
         {/* Only show Header in non-Looker environments */}
-        {!isLookerExtension() && <Header />}
+        {!isExtension && <Header />}
         {/* Only show TopNav and ProjectHeader in non-Looker environments */}
-        {!isLookerExtension() && <TopNav />}
-        {!isLookerExtension() && <ProjectHeader />}
+        {!isExtension && <TopNav />}
+        {!isExtension && <ProjectHeader />}
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
           <MainContent />
