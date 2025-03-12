@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share2, Square, Info } from 'lucide-react';
+import { Sparkles, ListChecks, Info } from 'lucide-react';
 
 export const ProjectHeader = () => {
   return (
@@ -7,10 +7,10 @@ export const ProjectHeader = () => {
       <h1 className="text-[15px] font-medium text-gray-900">big_query_project</h1>
       <div className="flex items-center space-x-2">
         <button className="p-1.5 hover:bg-gray-100 rounded">
-          <Share2 className="text-gray-600" size={18} />
+          <Sparkles className="text-gray-600" size={18} />
         </button>
         <button className="p-1.5 hover:bg-gray-100 rounded">
-          <Square className="text-gray-600" size={18} />
+          <ListChecks className="text-gray-600" size={18} />
         </button>
         <button className="p-1.5 hover:bg-gray-100 rounded">
           <Info className="text-gray-600" size={18} />

@@ -20,17 +20,75 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
   
   const renderLine = (line: string) => {
     // Handle empty lines
-    if (!line.trim()) return <div>&nbsp;</div>;
+    if (!line.trim()) return <div className="font-mono">&nbsp;</div>;
 
     // Handle comments
     if (line.trim().startsWith('#')) {
-      return <div className="text-[#5f6368]">{line}</div>;
+      return <div className="text-[#5f6368] font-mono">{line}</div>;
     }
 
     // Calculate indentation
     const indentMatch = line.match(/^(\s+)/);
     const indent = indentMatch ? indentMatch[0] : '';
     const trimmedLine = line.trim();
+
+    // Special handling for sql_on lines with specific patterns
+    if (trimmedLine.includes('${order_items.product_id}=') || trimmedLine.includes('${order_items.user_id}=')) {
+      if (trimmedLine.startsWith('sql_on:')) {
+        // Extract the part after sql_on:
+        const sqlOnMatch = trimmedLine.match(/^sql_on:\s*(.*)/);
+        if (sqlOnMatch) {
+          const sqlOnContent = sqlOnMatch[1];
+          
+          // Check if there are double semicolons and fix it
+          const semicolonMatch = sqlOnContent.match(/(.*?)\s*;;\s*(?:;;)?$/);
+          const contentWithoutSemicolons = semicolonMatch ? semicolonMatch[1] : sqlOnContent.replace(/\s*;;\s*$/, '');
+          
+          // Format the content to remove spaces around equals sign
+          const formattedContent = contentWithoutSemicolons.replace(/(\$\{[^}]+\})\s*=\s*(\$\{[^}]+\})/, '$1=$2');
+          
+          // Direct approach with inline styling to ensure highlighting works
+          return (
+            <div className="font-mono">
+              {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: <span style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">{formattedContent}</span> ;;
+            </div>
+          );
+        }
+      }
+    }
+    
+    // General handling for sql_on lines
+    if (trimmedLine.startsWith('sql_on:')) {
+      // Extract the part after sql_on:
+      const sqlOnMatch = trimmedLine.match(/^sql_on:\s*(.*)/);
+      if (sqlOnMatch) {
+        const sqlOnContent = sqlOnMatch[1];
+        
+        // Check if there are double semicolons and fix it
+        const semicolonMatch = sqlOnContent.match(/(.*?)\s*;;\s*(?:;;)?$/);
+        const contentWithoutSemicolons = semicolonMatch ? semicolonMatch[1] : sqlOnContent.replace(/\s*;;\s*$/, '');
+        
+        // For sql_on lines with ${} references, highlight the entire expression in purple
+        if (contentWithoutSemicolons.includes('${') && contentWithoutSemicolons.includes('=')) {
+          // Format the content to remove spaces around equals sign
+          const formattedContent = contentWithoutSemicolons.replace(/(\$\{[^}]+\})\s*=\s*(\$\{[^}]+\})/, '$1=$2');
+          
+          // Direct approach with inline styling to ensure highlighting works
+          return (
+            <div className="font-mono">
+              {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: <span style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">{formattedContent}</span> ;;
+            </div>
+          );
+        }
+        
+        // If it doesn't match our expected pattern, fall back to the default rendering
+        return (
+          <div className="font-mono">
+            {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: {contentWithoutSemicolons} ;;
+          </div>
+        );
+      }
+    }
 
     // Process line with colons (property definitions)
     const colonMatch = trimmedLine.match(/^([^:]+):(.*)/);
@@ -53,7 +111,7 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
         }
         
         // Add the string match with red color
-        parts.push(<span key={`str-${stringMatch.index}`} className="text-[#c5221f]">{stringMatch[0]}</span>);
+        parts.push(<span key={`str-${stringMatch.index}`} style={{color: "#c5221f"}} className="font-mono">{stringMatch[0]}</span>);
         
         lastIndex = stringMatch.index + stringMatch[0].length;
       }
@@ -71,6 +129,37 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
       // Process ${} references in each non-string part
       const processedParts = parts.map((part, i) => {
         if (typeof part === 'string') {
+          // Process SQL join keys and equals signs - remove spaces around equals sign
+          const joinKeyRegex = /(\$\{[^}]+\})(?:\s*)(=)(?:\s*)(\$\{[^}]+\})/g;
+          let joinKeyMatch;
+          let joinKeyParts = [];
+          let joinKeyLastIndex = 0;
+          
+          while ((joinKeyMatch = joinKeyRegex.exec(part)) !== null) {
+            // Add text before the match
+            if (joinKeyMatch.index > joinKeyLastIndex) {
+              joinKeyParts.push(part.substring(joinKeyLastIndex, joinKeyMatch.index));
+            }
+            
+            // Add the entire expression with purple color and no spaces
+            joinKeyParts.push(
+              <span key={`join-${joinKeyMatch.index}`} style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">
+                {joinKeyMatch[1]}={joinKeyMatch[3]}
+              </span>
+            );
+            
+            joinKeyLastIndex = joinKeyMatch.index + joinKeyMatch[0].length;
+          }
+          
+          // If we found join keys, add any remaining text and return
+          if (joinKeyParts.length > 0) {
+            if (joinKeyLastIndex < part.length) {
+              joinKeyParts.push(part.substring(joinKeyLastIndex));
+            }
+            return <React.Fragment key={`frag-${i}`}>{joinKeyParts}</React.Fragment>;
+          }
+          
+          // If no join keys, process regular ${} references
           const refRegex = /(\$\{[^}]+\})/g;
           let refMatch;
           let refParts = [];
@@ -83,7 +172,7 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
             }
             
             // Add the reference match with blue color
-            refParts.push(<span key={`ref-${refMatch.index}`} className="text-[#1967d2]">{refMatch[0]}</span>);
+            refParts.push(<span key={`ref-${refMatch.index}`} style={{color: "#1967d2"}} className="font-mono">{refMatch[0]}</span>);
             
             refLastIndex = refMatch.index + refMatch[0].length;
           }
@@ -105,19 +194,19 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
       });
       
       return (
-        <div>
-          {indent}<span className="text-[#1967d2]">{beforeColon}</span>:{processedParts}
+        <div className="font-mono">
+          {indent}<span style={{color: "#1967d2"}} className="font-mono">{beforeColon}</span>:{processedParts}
         </div>
       );
     }
 
     // Handle lines with brackets, braces, etc.
     if (trimmedLine === '{' || trimmedLine === '}' || trimmedLine === ';;') {
-      return <div>{indent}{trimmedLine}</div>;
+      return <div className="font-mono">{indent}{trimmedLine}</div>;
     }
 
     // Default rendering for non-special lines
-    return <div>{indent}{trimmedLine}</div>;
+    return <div className="font-mono">{indent}{trimmedLine}</div>;
   };
 
   return (
@@ -133,7 +222,7 @@ const CodeEditor: React.FC<{ file: FileType }> = ({ file }) => {
           ))}
         </div>
         {/* Code content */}
-        <div className="flex-1 font-mono text-[13px] pl-2 text-[#202124] whitespace-pre m-0 p-0 overflow-auto code-editor">
+        <div className="flex-1 font-mono text-[12px] pl-2 text-[#202124] whitespace-pre m-0 p-0 overflow-auto code-editor">
           {lines.map((line, i) => (
             <div key={i} className="h-[22px] leading-[22px] m-0 p-0">
               {renderLine(line)}
@@ -152,17 +241,75 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
   
   const renderLine = (line: string) => {
     // Handle empty lines
-    if (!line.trim()) return <div>&nbsp;</div>;
+    if (!line.trim()) return <div className="font-mono">&nbsp;</div>;
 
     // Handle comments
     if (line.trim().startsWith('#')) {
-      return <div className="text-[#5f6368]">{line}</div>;
+      return <div className="text-[#5f6368] font-mono">{line}</div>;
     }
 
     // Calculate indentation
     const indentMatch = line.match(/^(\s+)/);
     const indent = indentMatch ? indentMatch[0] : '';
     const trimmedLine = line.trim();
+
+    // Special handling for sql_on lines with specific patterns
+    if (trimmedLine.includes('${order_items.product_id}=') || trimmedLine.includes('${order_items.user_id}=')) {
+      if (trimmedLine.startsWith('sql_on:')) {
+        // Extract the part after sql_on:
+        const sqlOnMatch = trimmedLine.match(/^sql_on:\s*(.*)/);
+        if (sqlOnMatch) {
+          const sqlOnContent = sqlOnMatch[1];
+          
+          // Check if there are double semicolons and fix it
+          const semicolonMatch = sqlOnContent.match(/(.*?)\s*;;\s*(?:;;)?$/);
+          const contentWithoutSemicolons = semicolonMatch ? semicolonMatch[1] : sqlOnContent.replace(/\s*;;\s*$/, '');
+          
+          // Format the content to remove spaces around equals sign
+          const formattedContent = contentWithoutSemicolons.replace(/(\$\{[^}]+\})\s*=\s*(\$\{[^}]+\})/, '$1=$2');
+          
+          // Direct approach with inline styling to ensure highlighting works
+          return (
+            <div className="font-mono">
+              {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: <span style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">{formattedContent}</span> ;;
+            </div>
+          );
+        }
+      }
+    }
+    
+    // General handling for sql_on lines
+    if (trimmedLine.startsWith('sql_on:')) {
+      // Extract the part after sql_on:
+      const sqlOnMatch = trimmedLine.match(/^sql_on:\s*(.*)/);
+      if (sqlOnMatch) {
+        const sqlOnContent = sqlOnMatch[1];
+        
+        // Check if there are double semicolons and fix it
+        const semicolonMatch = sqlOnContent.match(/(.*?)\s*;;\s*(?:;;)?$/);
+        const contentWithoutSemicolons = semicolonMatch ? semicolonMatch[1] : sqlOnContent.replace(/\s*;;\s*$/, '');
+        
+        // For sql_on lines with ${} references, highlight the entire expression in purple
+        if (contentWithoutSemicolons.includes('${') && contentWithoutSemicolons.includes('=')) {
+          // Format the content to remove spaces around equals sign
+          const formattedContent = contentWithoutSemicolons.replace(/(\$\{[^}]+\})\s*=\s*(\$\{[^}]+\})/, '$1=$2');
+          
+          // Direct approach with inline styling to ensure highlighting works
+          return (
+            <div className="font-mono">
+              {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: <span style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">{formattedContent}</span> ;;
+            </div>
+          );
+        }
+        
+        // If it doesn't match our expected pattern, fall back to the default rendering
+        return (
+          <div className="font-mono">
+            {indent}<span style={{color: "#1967d2"}} className="font-mono">sql_on</span>: {contentWithoutSemicolons} ;;
+          </div>
+        );
+      }
+    }
 
     // Process line with colons (property definitions)
     const colonMatch = trimmedLine.match(/^([^:]+):(.*)/);
@@ -185,7 +332,7 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
         }
         
         // Add the string match with red color
-        parts.push(<span key={`str-${stringMatch.index}`} className="text-[#c5221f]">{stringMatch[0]}</span>);
+        parts.push(<span key={`str-${stringMatch.index}`} style={{color: "#c5221f"}} className="font-mono">{stringMatch[0]}</span>);
         
         lastIndex = stringMatch.index + stringMatch[0].length;
       }
@@ -203,6 +350,37 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
       // Process ${} references in each non-string part
       const processedParts = parts.map((part, i) => {
         if (typeof part === 'string') {
+          // Process SQL join keys and equals signs - remove spaces around equals sign
+          const joinKeyRegex = /(\$\{[^}]+\})(?:\s*)(=)(?:\s*)(\$\{[^}]+\})/g;
+          let joinKeyMatch;
+          let joinKeyParts = [];
+          let joinKeyLastIndex = 0;
+          
+          while ((joinKeyMatch = joinKeyRegex.exec(part)) !== null) {
+            // Add text before the match
+            if (joinKeyMatch.index > joinKeyLastIndex) {
+              joinKeyParts.push(part.substring(joinKeyLastIndex, joinKeyMatch.index));
+            }
+            
+            // Add the entire expression with purple color and no spaces
+            joinKeyParts.push(
+              <span key={`join-${joinKeyMatch.index}`} style={{color: "#8430ce", fontWeight: "normal", backgroundColor: "#eef1ff"}} className="font-mono">
+                {joinKeyMatch[1]}={joinKeyMatch[3]}
+              </span>
+            );
+            
+            joinKeyLastIndex = joinKeyMatch.index + joinKeyMatch[0].length;
+          }
+          
+          // If we found join keys, add any remaining text and return
+          if (joinKeyParts.length > 0) {
+            if (joinKeyLastIndex < part.length) {
+              joinKeyParts.push(part.substring(joinKeyLastIndex));
+            }
+            return <React.Fragment key={`frag-${i}`}>{joinKeyParts}</React.Fragment>;
+          }
+          
+          // If no join keys, process regular ${} references
           const refRegex = /(\$\{[^}]+\})/g;
           let refMatch;
           let refParts = [];
@@ -215,7 +393,7 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
             }
             
             // Add the reference match with blue color
-            refParts.push(<span key={`ref-${refMatch.index}`} className="text-[#1967d2]">{refMatch[0]}</span>);
+            refParts.push(<span key={`ref-${refMatch.index}`} style={{color: "#1967d2"}} className="font-mono">{refMatch[0]}</span>);
             
             refLastIndex = refMatch.index + refMatch[0].length;
           }
@@ -237,19 +415,19 @@ const FileSnippet: React.FC<{ file: FileType, title: string }> = ({ file, title 
       });
       
       return (
-        <div>
-          {indent}<span className="text-[#1967d2]">{beforeColon}</span>:{processedParts}
+        <div className="font-mono">
+          {indent}<span style={{color: "#1967d2"}} className="font-mono">{beforeColon}</span>:{processedParts}
         </div>
       );
     }
 
     // Handle lines with brackets, braces, etc.
     if (trimmedLine === '{' || trimmedLine === '}' || trimmedLine === ';;') {
-      return <div>{indent}{trimmedLine}</div>;
+      return <div className="font-mono">{indent}{trimmedLine}</div>;
     }
 
     // Default rendering for non-special lines
-    return <div>{indent}{trimmedLine}</div>;
+    return <div className="font-mono">{indent}{trimmedLine}</div>;
   };
 
   return (
@@ -346,13 +524,13 @@ explore: order_items {
   join: products {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.product_id} = \${products.id} ;;
+    sql_on: \${order_items.product_id}=\${products.id} ;;
   }
 
   join: users {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.user_id} = \${users.id} ;;
+    sql_on: \${order_items.user_id}=\${users.id} ;;
   }
 }`,
         icon: <FileText size={16} className="text-[#5f6368]" />,
@@ -380,13 +558,13 @@ explore: order_items {
   join: products {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.product_id} = \${products.id} ;;
+    sql_on: \${order_items.product_id}=\${products.id} ;;
   }
 
   join: users {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.user_id} = \${users.id} ;;
+    sql_on: \${order_items.user_id}=\${users.id} ;;
   }
 }`,
     icon: <FileText size={16} className="text-[#5f6368]" />,
@@ -1015,8 +1193,8 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">ecomm.model</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
-                                    <code>{`connection: "big_query_connection"
+                                  <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
+                                    <code className="font-mono">{`connection: "big_query_connection"
 
 include: "/views/**/*.view"
 
@@ -1031,13 +1209,13 @@ explore: order_items {
   join: products {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.product_id} = \${products.id} ;;
+    sql_on: \${order_items.product_id}=\${products.id} ;;
   }
 
   join: users {
     type: left_outer
     relationship: many_to_one
-    sql_on: \${order_items.user_id} = \${users.id} ;;
+    sql_on: \${order_items.user_id}=\${users.id} ;;
   }
 }`}</code>
                                   </pre>
@@ -1075,8 +1253,8 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/order_items.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
-                                    <code>{`view: order_items {
+                                  <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
+                                    <code className="font-mono">{`view: order_items {
   sql_table_name: bigquery-public-data.thelook_ecommerce.order_items ;;
 
   dimension: id {
@@ -1156,8 +1334,8 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/products.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
-                                    <code>{`view: products {
+                                  <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
+                                    <code className="font-mono">{`view: products {
   sql_table_name: bigquery-public-data.thelook_ecommerce.products ;;
 
   dimension: id {
@@ -1233,8 +1411,8 @@ explore: order_items {
                               <div className="p-4 border-b border-[#dadce0]">
                                 <div className="text-[13px] text-[#5f6368] font-mono mb-2">views/users.view</div>
                                 <div className="max-h-[200px] overflow-y-auto border border-[#dadce0] rounded">
-                                  <pre className="font-mono text-[13px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
-                                    <code>{`view: users {
+                                  <pre className="font-mono text-[12px] leading-[1.6] text-[#202124] whitespace-pre overflow-x-auto p-3 code-editor">
+                                    <code className="font-mono">{`view: users {
   sql_table_name: bigquery-public-data.thelook_ecommerce.users ;;
 
   dimension: id {

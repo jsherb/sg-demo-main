@@ -54,8 +54,31 @@
 }
 
 /* Apply monospace font to code elements */
-code, pre, .code-editor, .font-mono {
+code, pre, .code-editor, .font-mono, 
+pre *, code *, .code-editor *, .font-mono *,
+div.font-mono, div.code-editor, 
+pre code, pre span, code span,
+[class*="font-mono"] *, [class*="code-editor"] * {
   font-family: 'Roboto Mono', Menlo, Monaco, Consolas, 'Courier New', monospace !important;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+  font-feature-settings: normal !important;
+}
+
+/* Specific styling for LookML syntax highlighting */
+.text-[#1967d2], span[class*="text-[#1967d2]"] {
+  color: #1967d2 !important;
+}
+
+.text-[#c5221f], span[class*="text-[#c5221f]"] {
+  color: #c5221f !important;
+}
+
+.text-[#5f6368], span[class*="text-[#5f6368]"] {
+  color: #5f6368 !important;
+}
+
+.text-[#8430ce], span[class*="text-[#8430ce]"] {
+  color: #8430ce !important;
 } 
